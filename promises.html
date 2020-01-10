@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+<script>
+    function keyFilm(name, birthday, film_title, film_director){
+        this.name = name
+        this.birthday = birthday
+        this.film_title = film_title
+        this.film_director = film_director
+    }
+    
+    // const petition = async () => {
+    //     const movies = []
+    //     const response = await fetch("https://swapi.co/api/people/")
+    //     const data = await response.json()
+    //     data.results.forEach(async (element) => {
+    //         element.films.forEach(async film => {
+    //             const item_film = (async () => {
+    //                 const data_films = await fetch(film)
+    //                 const response_films = await data_films.json()
+    //                 const data_to_push = new keyFilm(element.name, element.birth_year, response_films.title, response_films.director)
+    //                 return data_to_push
+    //             })()
+    //             movies.push(item_film)
+    //         });
+    //     });
+    //     const result_movies = await Promise.all(movies)
+    //     const final_result = result_movies.reduce((counter, actual)=>{
+    //         counter[actual.film_title] = counter[actual.film_title] || []
+    //         counter[actual.film_title].push(actual)
+    //         return counter
+    //     }, {})
+    //     console.log(final_result)
+    //     return final_result
+    // }
+    // petition()
+
+    function petition(){
+        var final_films = []
+        var final_array = {}
+        const array_promises = []
+        fetch("https://swapi.co/api/people/")
+        .then((response) => response.json())
+        .then( (films) => {
+            films.results.forEach(element => {
+                element.films.forEach((film) =>{
+                    array_promises.push(    
+                        fetch(film)
+                        .then((data) =>
+                            data.json()
+                        )
+                        .then((item) => {
+                            const data_to_push = new keyFilm(element.name, element.birth_year, item.title, item.director)
+                            final_films.push(data_to_push)
+                            return data_to_push
+                        })
+                    )
+                })
+            });
+        })
+        .then(()=>{
+            Promise.all(array_promises)
+            .then((response)=>{
+                response.forEach((film)=>{
+                    final_array[film.film_title] = final_array[film.film_title] || []
+                    final_array[film.film_title].push(film)
+                    return final_array 
+                })  
+                console.log(final_array)
+            })
+        })
+    }
+    petition()
+
+
+</script>
+</body>
+</html>
